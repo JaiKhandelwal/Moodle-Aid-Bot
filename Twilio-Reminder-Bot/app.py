@@ -50,8 +50,8 @@ def sms_reply():
     elif re.match(BBURL, msg):
         media_response = MessagingResponse()
         msg_x = media_response.message()
-        # lecture_URL = lec_Scraper(msg)
-        msg_x.body("")
+        lecture_URL = lec_Scraper(msg)
+        msg_x.media(lecture_URL)
         return str(media_response)
     
     elif msg.isnumeric():

@@ -6,7 +6,7 @@ import os
 import re
 import sys
 import shutil
-from datetime import datetime
+import datetime
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -44,6 +44,7 @@ chrome_options.add_experimental_option("prefs", prefs)
 
 driver = webdriver.Chrome(PATH, options=chrome_options)
 driver.get("https://courses.iris.nitk.ac.in/my/")
+d = str(datetime.datetime.now())
 
 def initialize_driver(bigblue_Button):
     clean_dir()
@@ -54,7 +55,7 @@ def initialize_driver(bigblue_Button):
         w.until(EC.presence_of_element_located(
             (By.CLASS_NAME, "acorn-fullscreen-button")))
 
-        print("[" + datetime.now() + "] : " + "Page Loaded")
+        print("[" + d + "] : " + "Page Loaded")
     except :
         print("Timeout happened no page load")
 
@@ -62,8 +63,8 @@ def initialize_driver(bigblue_Button):
 def download_pdf():
     driver.execute_script(
         "$i('https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js')")
-    time.sleep(2)
-    print("[" + datetime.now() + "] : " + "JSPDF Imported")
+    time.sleep(5)
+    print("[" + d + "] : " + "JSPDF Imported")
     lecturetitle = driver.execute_script("""
     var lecturetitle = document.getElementById('recording-title').innerHTML;
         var thumbnail = document.getElementsByClassName('thumbnail-wrapper');
@@ -153,7 +154,7 @@ def download_pdf():
         return lecturetitle
     """)
     time.sleep(10)
-    print("[" + datetime.now() + "] : " + "Downloaded " + lecturetitle + ".pdf")
+    print("[" + d + "] : " + "Downloaded " + lecturetitle + ".pdf")
 
 
 def get_filepaths(directory):
@@ -170,9 +171,10 @@ def upload_cloud():
     while(len(filepath) < 1):
         filepath = get_filepaths(
         'E:/Projects/Personal/Assignment Reminder Moodle/Lec2PDFScraper/Downloaded_PDF')
-   
+    print("[" + d + "] : " +
+          "Uploading To Cloudinary" )
     upload_res = cloudinary.uploader.upload(filepath[0])
-    print("[" + datetime.now() + "] : " +
+    print("[" + d + "] : " +
           "Cloudinary URL Generated : " + upload_res['url'])
     return upload_res['url']
 
@@ -182,7 +184,7 @@ def clean_dir():
         os.remove(os.path.join(dir, f))
 
 def login():
-    print("[" + datetime.now() + "] : " + "Logging In Into Moodle")
+    print("[" + d + "] : " + "Logging In Into Moodle")
     
     username = driver.find_element_by_id("user_login")
     username.send_keys(IRIS_USERNAME)
@@ -198,7 +200,10 @@ def lec_Scraper(lecture_URL):
     login()
     initialize_driver(lecture_URL)
     download_pdf()
+    
     return upload_cloud()
 
 if __name__ == "__main__":
-    print(lec_Scraper(sys.argv[0]))
+    lec_Scraper("https://lectures.iris.nitk.ac.in/playback/presentation/2.0/playback.html?meetingId=d44b6b8cbe49be24ea20a99ae2a67b0d16793013-1628576389647&id=57842")
+    print("[" + d + "] : " + "Closing Driver")
+    driver.close()

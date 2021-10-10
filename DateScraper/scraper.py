@@ -35,6 +35,7 @@ chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
 driver = webdriver.Chrome(PATH, options=chrome_options)
 driver.get("https://courses.iris.nitk.ac.in/calendar/view.php?view=month")
+d = str(datetime.datetime.now())
 
 def monthToNum(Month):
     return {
@@ -96,7 +97,7 @@ def parse_time(due_date):
     return time_24
     
 def dump_to_json(assignments):
-    print("[" + datetime.now() + "] : " + "Dumping to .JSON")
+    print("[" + d + "] : " + "Dumping to .JSON")
     filename = "Assignment.json"
     with open(filename, 'w') as output :
         json.dump(assignments, output, indent = 4)
@@ -106,7 +107,7 @@ def dump_to_json(assignments):
     shutil.move(src, dest)
 
 def login():
-    print("[" + datetime.now() + "] : " + "Logging In Into Moodle")
+    print("[" + d + "] : " + "Logging In Into Moodle")
     username = driver.find_element_by_id("user_login")
     username.send_keys(IRIS_USERNAME)
 
@@ -118,7 +119,7 @@ def login():
 
 def fetch_due_dates():
     urls = []
-    print("[" + datetime.now() + "] : " + "Fetching Due Dates")
+    print("[" + d + "] : " + "Fetching Due Dates")
     prev_month = driver.execute_script("""
         var link = document.getElementsByClassName("arrow_link previous")[0].href;
         return link;
@@ -156,7 +157,8 @@ def fetch_due_dates():
         urls.extend(url_x)
 
     assignments = []
-    print("[" + datetime.now() + "] : " + "Merging Assignment Dictionary")
+    print("[" + d + "] : " +
+          "Merging Assignment Dictionary")
     for url in urls:
         pattern = 'https://courses.iris.nitk.ac.in/mod/assign/*'
 
@@ -182,7 +184,7 @@ def fetch_due_dates():
 def run_scraper():
     login()
     fetch_due_dates()
-    print("[" + datetime.now() + "] : " + "Closing Driver")
+    print("[" + d + "] : " + "Closing Web Driver")
     driver.close()
 
 
